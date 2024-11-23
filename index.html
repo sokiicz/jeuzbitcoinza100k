@@ -1,19 +1,32 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-TFD69N6D');</script>
+    <!-- Google Tag Manager -->
+    <script>
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-TFD69N6D');
+    </script>
     <!-- End Google Tag Manager -->
 
     <meta charset="UTF-8">
     <title>Bitcoin Price Checker</title>
     <!-- Importing Fonts from Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Roboto+Mono&display=swap" rel="stylesheet">
+    <!-- Dynamic Favicon Links -->
+    <!-- For favicon.ico -->
+    <link id="favicon-ico" rel="icon" type="image/x-icon" href="favicon-A.ico">
+    <!-- For PNG favicons -->
+    <link id="favicon-16" rel="icon" type="image/png" sizes="16x16" href="favicon-A-16x16.png">
+    <link id="favicon-32" rel="icon" type="image/png" sizes="32x32" href="favicon-A-32x32.png">
+    <!-- For Android Chrome Icons -->
+    <link id="android-chrome-192" rel="icon" type="image/png" sizes="192x192" href="android-chrome-192x192-A.png">
+    <link id="android-chrome-512" rel="icon" type="image/png" sizes="512x512" href="android-chrome-512x512-A.png">
+    <!-- For Apple Touch Icon -->
+    <link id="apple-touch-icon" rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-A.png">
+    <!-- Existing styles -->
     <style>
         body {
             background: linear-gradient(to bottom, #FFFFFF, #F0F2F5);
@@ -65,9 +78,11 @@
 </head>
 <body>
 
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TFD69N6D"
-    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript>
+        <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TFD69N6D"
+        height="0" width="0" style="display:none;visibility:hidden"></iframe>
+    </noscript>
     <!-- End Google Tag Manager (noscript) -->
 
     <div class="container">
@@ -77,7 +92,29 @@
         <h1 id="status">Načítání...</h1>
     </div>
 
+    <!-- JavaScript Functions -->
     <script>
+        function changeFavicons(status) {
+            const favicons = [
+                { id: 'favicon-ico', fileA: 'favicon-A.ico', fileN: 'favicon-N.ico' },
+                { id: 'favicon-16', fileA: 'favicon-A-16x16.png', fileN: 'favicon-N-16x16.png' },
+                { id: 'favicon-32', fileA: 'favicon-A-32x32.png', fileN: 'favicon-N-32x32.png' },
+                { id: 'android-chrome-192', fileA: 'android-chrome-192x192-A.png', fileN: 'android-chrome-192x192-N.png' },
+                { id: 'android-chrome-512', fileA: 'android-chrome-512x512-A.png', fileN: 'android-chrome-512x512-N.png' },
+                { id: 'apple-touch-icon', fileA: 'apple-touch-icon-A.png', fileN: 'apple-touch-icon-N.png' },
+                // Add additional favicons here if needed
+            ];
+
+            favicons.forEach(favicon => {
+                const link = document.getElementById(favicon.id);
+                if (status === 'Ano') {
+                    link.href = favicon.fileA;
+                } else if (status === 'Ne') {
+                    link.href = favicon.fileN;
+                }
+            });
+        }
+
         function checkBitcoinPrice() {
             fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd')
                 .then(response => response.json())
@@ -88,10 +125,12 @@
                         statusElement.textContent = 'Ano';
                         statusElement.classList.remove('status-no');
                         statusElement.classList.add('status-yes');
+                        changeFavicons('Ano');
                     } else {
                         statusElement.textContent = 'Ne';
                         statusElement.classList.remove('status-yes');
                         statusElement.classList.add('status-no');
+                        changeFavicons('Ne');
                     }
                 })
                 .catch(error => {
@@ -100,6 +139,8 @@
                     statusElement.textContent = 'Chyba';
                     statusElement.classList.remove('status-yes');
                     statusElement.classList.add('status-no');
+                    // Optionally, set default favicons on error
+                    changeFavicons('Ne');
                 });
         }
 
@@ -107,5 +148,6 @@
         // Update the price every minute
         setInterval(checkBitcoinPrice, 60000);
     </script>
+
 </body>
 </html>
