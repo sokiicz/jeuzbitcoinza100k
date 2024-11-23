@@ -43,6 +43,29 @@
     <!-- For Apple Touch Icon -->
     <link id="apple-touch-icon" rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-A.png">
 
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "edf4c6c7-38e9-4d25-9ae5-794bacbac942",
+      promptOptions: {
+        slidedown: {
+          enabled: true,
+          autoPrompt: true,
+          actionMessage: "Chcete dostávat upozornění, když Bitcoin dosáhne 100 000 USD?",
+          acceptButton: "Ano",
+          cancelButton: "Ne",
+        },
+      },
+      notifyButton: {
+        enable: false, // Disable the bell icon
+      },
+    });
+  });
+</script>
+    
+    
     <!-- Styles -->
     <style>
         body {
