@@ -89,9 +89,33 @@
         h1.status-no {
             color: #2C3E50; /* Dark Slate Gray */
         }
+        /* Mute/Unmute Button Styles */
+        #sound-toggle {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 1000;
+            outline: none;
+        }
+        #sound-toggle:hover {
+            opacity: 0.7;
+        }
+        #sound-icon {
+            color: #2C3E50; /* Dark Slate Gray */
+        }
     </style>
 </head>
 <body>
+
+    <!-- Mute/Unmute Button -->
+    <button id="sound-toggle" aria-label="Toggle Sound">
+        <!-- Speaker Icon -->
+        <span id="sound-icon">&#128266;</span>
+    </button>
 
     <!-- Google Tag Manager (noscript) -->
     <noscript>
@@ -112,9 +136,28 @@
 
     <!-- JavaScript Functions -->
     <script>
+        // Variables for Mute Functionality and Status Tracking
+        let isMuted = false;
+        let previousStatus = null;
+
+        // Sound Toggle Functionality
+        document.getElementById('sound-toggle').addEventListener('click', function() {
+            isMuted = !isMuted;
+            updateSoundIcon();
+        });
+
+        function updateSoundIcon() {
+            const soundIcon = document.getElementById('sound-icon');
+            if (isMuted) {
+                soundIcon.textContent = '\uD83D\uDD07'; // Muted speaker icon
+            } else {
+                soundIcon.textContent = '\uD83D\uDD0A'; // Speaker with three sound waves
+            }
+        }
+
         // Load Sound Files
         const soundAno = new Audio('celebration.mp3');
-        const soundNe = new Audio('sad-trumpet.wav');
+        const soundNe = new Audio('sad-trumpet.mp3');
 
         function changeFavicons(status) {
             const favicons = [
@@ -151,20 +194,32 @@
                 .then(data => {
                     const price = data.bitcoin.usd;
                     const statusElement = document.getElementById('status');
+                    let currentStatus;
+
                     if (price >= 100000) {
+                        currentStatus = 'Ano';
                         statusElement.textContent = 'Ano';
                         statusElement.classList.remove('status-no');
                         statusElement.classList.add('status-yes');
                         changeFavicons('Ano');
-                        soundAno.play();
-                        launchConfetti();
+                        if (!isMuted && (previousStatus !== 'Ano')) {
+                            soundAno.play();
+                        }
+                        if (previousStatus !== 'Ano') {
+                            launchConfetti();
+                        }
                     } else {
+                        currentStatus = 'Ne';
                         statusElement.textContent = 'Ne';
                         statusElement.classList.remove('status-yes');
                         statusElement.classList.add('status-no');
                         changeFavicons('Ne');
-                        soundNe.play();
+                        if (!isMuted && (previousStatus !== 'Ne')) {
+                            soundNe.play();
+                        }
                     }
+
+                    previousStatus = currentStatus;
                 })
                 .catch(error => {
                     console.error('Chyba při načítání ceny Bitcoinu:', error);
@@ -174,11 +229,19 @@
                     statusElement.classList.add('status-no');
                     // Optionally, set default favicons on error
                     changeFavicons('Ne');
-                    soundNe.play();
+                    if (!isMuted && (previousStatus !== 'Chyba')) {
+                        soundNe.play();
+                    }
+                    previousStatus = 'Chyba';
                 });
         }
 
+        // Initial Sound Icon Update
+        updateSoundIcon();
+
+        // Initial Check
         checkBitcoinPrice();
+
         // Update the price every minute
         setInterval(checkBitcoinPrice, 60000);
     </script>
