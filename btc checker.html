@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-TFD69N6D');</script>
+    <!-- End Google Tag Manager -->
+
+    <meta charset="UTF-8">
+    <title>Bitcoin Price Checker</title>
+    <!-- Importing Fonts from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Roboto+Mono&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(to bottom, #FFFFFF, #F0F2F5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+        }
+        .container {
+            text-align: center;
+            animation: fadeIn 1s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .bitcoin-logo {
+            font-size: 8vw;
+            color: #F7931A; /* Bitcoin Orange */
+            margin-bottom: 1vh;
+            transition: transform 0.3s ease;
+        }
+        .bitcoin-logo::before {
+            content: "\20BF"; /* Unicode character for Bitcoin symbol */
+            font-family: 'Roboto Mono', monospace;
+        }
+        .bitcoin-logo:hover {
+            transform: scale(1.05);
+        }
+        a.bitcoin-link {
+            text-decoration: none;
+        }
+        h1 {
+            font-size: 8vw;
+            font-weight: 600;
+            margin: 0;
+            transition: color 0.5s ease-in-out;
+        }
+        h1.status-yes {
+            color: #F7931A; /* Bitcoin Orange */
+        }
+        h1.status-no {
+            color: #2C3E50; /* Dark Slate Gray */
+        }
+    </style>
+</head>
+<body>
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TFD69N6D"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <div class="container">
+        <a href="https://coinmarketcap.com/currencies/bitcoin/" target="_blank" rel="noopener noreferrer" class="bitcoin-link">
+            <div class="bitcoin-logo"></div>
+        </a>
+        <h1 id="status">Načítání...</h1>
+    </div>
+
+    <script>
+        function checkBitcoinPrice() {
+            fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd')
+                .then(response => response.json())
+                .then(data => {
+                    const price = data.bitcoin.usd;
+                    const statusElement = document.getElementById('status');
+                    if (price >= 100000) {
+                        statusElement.textContent = 'Ano';
+                        statusElement.classList.remove('status-no');
+                        statusElement.classList.add('status-yes');
+                    } else {
+                        statusElement.textContent = 'Ne';
+                        statusElement.classList.remove('status-yes');
+                        statusElement.classList.add('status-no');
+                    }
+                })
+                .catch(error => {
+                    console.error('Chyba při načítání ceny Bitcoinu:', error);
+                    const statusElement = document.getElementById('status');
+                    statusElement.textContent = 'Chyba';
+                    statusElement.classList.remove('status-yes');
+                    statusElement.classList.add('status-no');
+                });
+        }
+
+        checkBitcoinPrice();
+        // Update the price every minute
+        setInterval(checkBitcoinPrice, 60000);
+    </script>
+</body>
+</html>
