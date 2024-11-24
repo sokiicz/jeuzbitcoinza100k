@@ -2,14 +2,13 @@
 <html lang="cs">
 <head>
     <!-- Google Tag Manager -->
-<script>
-    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-TFD69N6D');
-</script>
-
+    <script>
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-TFD69N6D');
+    </script>
     <!-- End Google Tag Manager -->
 
     <meta charset="UTF-8">
@@ -40,37 +39,38 @@
     <!-- For Apple Touch Icon -->
     <link id="apple-touch-icon" rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-A.png">
 
-<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-<script>
-  window.OneSignal = window.OneSignal || [];
-  OneSignal.push(function() {
-    OneSignal.init({
-      appId: "edf4c6c7-38e9-4d25-9ae5-794bacbac942",
-      promptOptions: {
-        slidedown: {
-          prompts: [
-            {
-              type: "push", // Required for push notifications
-              autoPrompt: true,
-              text: {
-                actionMessage: "Chcete dostávat upozornění, když Bitcoin dosáhne 100 000 USD?",
-                acceptButton: "Ano",
-                cancelButton: "Ne",
-              },
-            },
-          ],
-        },
-      },
-      notifyButton: {
-        enable: false, // Disable the bell icon
-      },
-      allowLocalhostAsSecureOrigin: true, // Optional: allows testing on localhost
-    });
-  });
-</script>
+    <!-- OneSignal SDK -->
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <script>
+      window.OneSignal = window.OneSignal || [];
+      OneSignal.push(function() {
+        OneSignal.init({
+          appId: "edf4c6c7-38e9-4d25-9ae5-794bacbac942",
+          promptOptions: {
+            slidedown: {
+              prompts: [
+                {
+                  type: "push",
+                  autoPrompt: true,
+                  text: {
+                    actionMessage: "Chcete dostávat upozornění, když Bitcoin dosáhne 100 000 USD?",
+                    acceptButton: "Ano",
+                    cancelButton: "Ne"
+                  }
+                }
+              ]
+            }
+          },
+          notifyButton: {
+            enable: false
+          },
+          serviceWorkerPath: 'OneSignalSDKWorker.js',
+          serviceWorkerParam: { scope: '/' },
+          allowLocalhostAsSecureOrigin: true
+        });
+      });
+    </script>
 
-    
-    
     <!-- Styles -->
     <style>
         body {
@@ -173,11 +173,19 @@
         // Variables for Mute Functionality and Status Tracking
         let isMuted = false;
         let previousStatus = null;
+        let initialLoad = true;
+        let userInteracted = false;
+
+        // User Interaction Detection
+        document.addEventListener('click', function() {
+            userInteracted = true;
+        });
 
         // Sound Toggle Functionality
         document.getElementById('sound-toggle').addEventListener('click', function() {
             isMuted = !isMuted;
             updateSoundIcon();
+            userInteracted = true;
         });
 
         function updateSoundIcon() {
@@ -185,7 +193,7 @@
             if (isMuted) {
                 soundIcon.textContent = '\uD83D\uDD07'; // Muted speaker icon
             } else {
-                soundIcon.textContent = '\uD83D\uDD0A'; // Speaker with three sound waves
+                soundIcon.textContent = '\uD83D\uDD0A'; // Speaker with sound waves
             }
         }
 
@@ -236,10 +244,10 @@
                         statusElement.classList.remove('status-no');
                         statusElement.classList.add('status-yes');
                         changeFavicons('Ano');
-                        if (!isMuted && previousStatus !== 'Ano') {
+                        if (userInteracted && !isMuted && previousStatus !== 'Ano' && !initialLoad) {
                             soundAno.play().catch(error => console.error('Error playing soundAno:', error));
                         }
-                        if (previousStatus !== 'Ano') {
+                        if (previousStatus !== 'Ano' && !initialLoad) {
                             launchConfetti();
                         }
                     } else {
@@ -248,12 +256,13 @@
                         statusElement.classList.remove('status-yes');
                         statusElement.classList.add('status-no');
                         changeFavicons('Ne');
-                        if (!isMuted && previousStatus !== 'Ne') {
+                        if (userInteracted && !isMuted && previousStatus !== 'Ne' && !initialLoad) {
                             soundNe.play().catch(error => console.error('Error playing soundNe:', error));
                         }
                     }
 
                     previousStatus = currentStatus;
+                    initialLoad = false; // Set to false after the first run
                 })
                 .catch(error => {
                     console.error('Chyba při načítání ceny Bitcoinu:', error);
@@ -261,12 +270,12 @@
                     statusElement.textContent = 'Chyba';
                     statusElement.classList.remove('status-yes');
                     statusElement.classList.add('status-no');
-                    // Optionally, set default favicons on error
                     changeFavicons('Ne');
-                    if (!isMuted && previousStatus !== 'Chyba') {
+                    if (userInteracted && !isMuted && previousStatus !== 'Chyba' && !initialLoad) {
                         soundNe.play().catch(error => console.error('Error playing soundNe:', error));
                     }
                     previousStatus = 'Chyba';
+                    initialLoad = false; // Set to false even if there's an error
                 });
         }
 
@@ -275,8 +284,9 @@
 
         // Initial Check
         checkBitcoinPrice();
-        // Update the price every minute
-        setInterval(checkBitcoinPrice, 60000);
+
+        // Update the price every 5 minutes
+        setInterval(checkBitcoinPrice, 300000); // 300,000 milliseconds = 5 minutes
     </script>
 
 </body>
