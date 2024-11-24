@@ -40,7 +40,7 @@
     <link id="apple-touch-icon" rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-A.png">
 
     <!-- OneSignal SDK -->
-    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" async></script>
     <script>
       window.OneSignal = window.OneSignal || [];
       OneSignal.push(function() {
@@ -175,6 +175,9 @@
         let previousStatus = null;
         let initialLoad = true;
         let userInteracted = false;
+        let fetchInterval = 900000; // 15 minutes
+        let maxInterval = 3600000; // 1 hour
+        let fetchIntervalId;
 
         // User Interaction Detection
         document.addEventListener('click', function() {
@@ -190,11 +193,7 @@
 
         function updateSoundIcon() {
             const soundIcon = document.getElementById('sound-icon');
-            if (isMuted) {
-                soundIcon.textContent = '\uD83D\uDD07'; // Muted speaker icon
-            } else {
-                soundIcon.textContent = '\uD83D\uDD0A'; // Speaker with sound waves
-            }
+            soundIcon.textContent = isMuted ? '\uD83D\uDD07' : '\uD83D\uDD0A';
         }
 
         // Reference Audio Elements
@@ -232,8 +231,27 @@
 
         function checkBitcoinPrice() {
             fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd')
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        if (response.status === 429) {
+                            console.warn('Rate limit exceeded. Increasing interval.');
+                            fetchInterval = Math.min(fetchInterval * 2, maxInterval);
+                            clearInterval(fetchIntervalId);
+                            fetchIntervalId = setInterval(checkBitcoinPrice, fetchInterval);
+                        }
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
+                    // Reset fetch interval on successful response
+                    if (fetchInterval !== 900000) {
+                        fetchInterval = 900000; // Reset to 15 minutes
+                        clearInterval(fetchIntervalId);
+                        fetchIntervalId = setInterval(checkBitcoinPrice, fetchInterval);
+                    }
+
+                    // Existing code to update the status
                     const price = data.bitcoin.usd;
                     const statusElement = document.getElementById('status');
                     let currentStatus;
@@ -262,7 +280,7 @@
                     }
 
                     previousStatus = currentStatus;
-                    initialLoad = false; // Set to false after the first run
+                    initialLoad = false;
                 })
                 .catch(error => {
                     console.error('Chyba při načítání ceny Bitcoinu:', error);
@@ -272,10 +290,10 @@
                     statusElement.classList.add('status-no');
                     changeFavicons('Ne');
                     if (userInteracted && !isMuted && previousStatus !== 'Chyba' && !initialLoad) {
-                        soundNe.play().catch(error => console.error('Error playing soundNe:', error));
+                        soundNe.play().catch(err => console.error('Error playing soundNe:', err));
                     }
                     previousStatus = 'Chyba';
-                    initialLoad = false; // Set to false even if there's an error
+                    initialLoad = false;
                 });
         }
 
@@ -285,8 +303,8 @@
         // Initial Check
         checkBitcoinPrice();
 
-        // Update the price every 5 minutes
-        setInterval(checkBitcoinPrice, 300000); // 300,000 milliseconds = 5 minutes
+        // Set up the interval
+        fetchIntervalId = setInterval(checkBitcoinPrice, fetchInterval);
     </script>
 
 </body>
