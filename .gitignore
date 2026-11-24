@@ -1,0 +1,16 @@
+# Tajné údaje a sestavení
+.env*
+!.env.example
+*.env
+*.pem
+node_modules/
+dist/
+
+# Interní soubory workspace (veřejné repo je nesmí obsahovat)
+CLAUDE.md
+AGENTS.md
+STAV.md
+PROJEKT.md
+.claude/
+.mcp.json
+app-meta.json

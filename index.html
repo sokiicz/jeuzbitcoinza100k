@@ -13,11 +13,13 @@
 
     <meta charset="UTF-8">
     <title>Je už Bitcoin za 100k?</title>
+    <link rel="canonical" href="https://sokiicz.github.io/jeuzbitcoinza100k/" />
     <!-- Meta Tags for Social Media Sharing -->
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Je už Bitcoin za 100k?" />
     <meta property="og:description" content="Zjistěte, zda Bitcoin dosáhl hodnoty 100 000 USD." />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://sokiicz.github.io/jeuzbitcoinza100k/" />
     <meta property="og:locale" content="cs_CZ" />
 
     <!-- Twitter Card Meta Tags -->
@@ -38,14 +40,6 @@
     <link id="android-chrome-512" rel="icon" type="image/png" sizes="512x512" href="android-chrome-512x512-A.png">
     <!-- For Apple Touch Icon -->
     <link id="apple-touch-icon" rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-A.png">
-
-    <!-- Initialize window.OneSignal -->
-    <script>
-      window.OneSignal = window.OneSignal || [];
-    </script>
-
-    <!-- OneSignal SDK -->
-    <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
 
     <!-- Styles -->
     <style>
@@ -144,37 +138,6 @@
 
     <!-- Include Canvas Confetti Library -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-
-    <!-- OneSignal Initialization -->
-    <script>
-      window.OneSignal = window.OneSignal || [];
-      OneSignal.push(function() {
-        OneSignal.init({
-          appId: "edf4c6c7-38e9-4d25-9ae5-794bacbac942",
-          promptOptions: {
-            slidedown: {
-              prompts: [
-                {
-                  type: "push",
-                  autoPrompt: true,
-                  text: {
-                    actionMessage: "Chcete dostávat upozornění, když Bitcoin dosáhne 100 000 USD?",
-                    acceptButton: "Ano",
-                    cancelButton: "Ne"
-                  }
-                }
-              ]
-            }
-          },
-          notifyButton: {
-            enable: false
-          },
-          serviceWorkerPath: 'OneSignalSDKWorker.js',
-          serviceWorkerParam: { scope: '/' },
-          allowLocalhostAsSecureOrigin: true
-        });
-      });
-    </script>
 
     <!-- JavaScript Functions -->
     <script>
